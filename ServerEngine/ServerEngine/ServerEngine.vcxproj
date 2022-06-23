@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="ServerEngine.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TCPServerModule.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
