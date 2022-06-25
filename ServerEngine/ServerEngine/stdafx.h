@@ -6,4 +6,6 @@
 #include <string>
 #include <stdint.h>
 #include <system_error>
+#include <functional>
+
 #include "Common.h"

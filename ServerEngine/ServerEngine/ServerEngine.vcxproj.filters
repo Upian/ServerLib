@@ -53,5 +53,11 @@
     <ClInclude Include="Common.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="TCPClientModule.h">
+      <Filter>TCPClientModule</Filter>
+    </ClInclude>
+    <ClInclude Include="Proxy.h">
+      <Filter>TCPClientModule</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
