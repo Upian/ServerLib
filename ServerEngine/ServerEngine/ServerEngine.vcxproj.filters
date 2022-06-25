@@ -19,6 +19,9 @@
     <Filter Include="TCPClientModule">
       <UniqueIdentifier>{d2900b1e-ae83-4f8e-96ef-f94394175918}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{4e634383-c3e2-4c97-8174-8f4b9b5f55dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServerEngine.cpp">
@@ -26,6 +29,12 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>TCPServerModule</Filter>
+    </ClCompile>
+    <ClCompile Include="TCPServerModule.cpp">
+      <Filter>TCPServerModule</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -35,8 +44,14 @@
     <ClInclude Include="ServerEngine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>TCPServerModule</Filter>
+    </ClInclude>
     <ClInclude Include="TCPServerModule.h">
       <Filter>TCPServerModule</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
