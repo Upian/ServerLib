@@ -25,6 +25,7 @@ void TCPServerModule::DoAccept() {
 			if (!_error) {
 				Session::Create(std::move(m_socket))->Start();
 //				std::make_shared<Session>(std::move(m_socket))->Start();
+				//Log
 			}
 			this->DoAccept<T_Session>();
 		}

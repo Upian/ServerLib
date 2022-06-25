@@ -7,5 +7,6 @@
 #include <stdint.h>
 #include <system_error>
 #include <functional>
+#include <iostream>
 
 #include "Common.h"

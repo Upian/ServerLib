@@ -36,6 +36,9 @@
     <ClCompile Include="TCPServerModule.cpp">
       <Filter>TCPServerModule</Filter>
     </ClCompile>
+    <ClCompile Include="Proxy.cpp">
+      <Filter>TCPClientModule</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
