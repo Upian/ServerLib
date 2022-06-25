@@ -147,6 +147,7 @@
     <ClInclude Include="Proxy.h" />
     <ClInclude Include="ServerEngine.h" />
     <ClInclude Include="Session.h" />
+    <ClInclude Include="SessionManager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TCPClientModule.h" />
     <ClInclude Include="TCPServerModule.h" />

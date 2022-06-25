@@ -1,0 +1,2 @@
+#pragma once
+//Manage session

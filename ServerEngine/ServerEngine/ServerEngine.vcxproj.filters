@@ -62,5 +62,8 @@
     <ClInclude Include="Proxy.h">
       <Filter>TCPClientModule</Filter>
     </ClInclude>
+    <ClInclude Include="SessionManager.h">
+      <Filter>TCPServerModule</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
