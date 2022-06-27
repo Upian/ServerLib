@@ -125,7 +125,7 @@ void Proxy::HandleWrite(const std::error_code& _error) {
 	if (m_stopped)
 		return;
 
-	if (_error) {
+	if (!_error) {
 		// Wait 10 seconds before sending the next heartbeat.
 		m_heartbeatTimer.expires_after(std::chrono::seconds(10));
 		m_heartbeatTimer.async_wait(std::bind(&Proxy::StartWrite, this));

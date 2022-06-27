@@ -20,7 +20,7 @@ public:
 
 	void Start(tcp::resolver::results_type _endpoints);
 	void Stop();
-	void Send(std::string _buffer) { m_inputBuffer = _buffer; }
+
 private:
 	Proxy(asio::io_context& _ioContext);
 
@@ -39,7 +39,7 @@ private:
 	bool m_stopped = false;
 	tcp::resolver::results_type m_endpoints;
 	tcp::socket m_socket;
-	std::string m_inputBuffer;
+	std::string m_inputBuffer = "test";
 	steady_timer m_deadline;
 	steady_timer m_heartbeatTimer;
 };

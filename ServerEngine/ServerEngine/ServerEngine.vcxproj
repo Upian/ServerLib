@@ -143,6 +143,7 @@
     <ClCompile Include="TCPServerModule.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Buffer.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Proxy.h" />
     <ClInclude Include="ServerEngine.h" />
