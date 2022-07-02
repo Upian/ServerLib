@@ -10,15 +10,12 @@ Proxy::~Proxy() {
 void Proxy::Start(tcp::resolver::results_type _endpoints) {
 	m_endpoints = _endpoints;
 	this->StartConnect(m_endpoints.begin());
-	m_deadline.async_wait(std::bind(&Proxy::CheckDeadline, this));
 }
 
 void Proxy::Stop() {
 	m_stopped = true;
 	std::error_code ignoredError;
 	m_socket.close(ignoredError);
-	m_deadline.cancel();
-	m_heartbeatTimer.cancel();
 }
 
 void Proxy::Send(Buffer& _buffer) { //나중에 패킷 풀로 변경
@@ -38,8 +35,6 @@ void Proxy::Send(Buffer& _buffer) { //나중에 패킷 풀로 변경
 
 Proxy::Proxy(asio::io_context* _ioContext) :
 	m_socket(*_ioContext),
-	m_deadline(*_ioContext),
-	m_heartbeatTimer(*_ioContext),
 	m_ioContext(_ioContext)
 { }
 
@@ -47,9 +42,6 @@ void Proxy::StartConnect(tcp::resolver::results_type::iterator _iterEndpoints) {
 	if (_iterEndpoints != m_endpoints.end()) {
 		//Log
 		std::cout << "Trying " << _iterEndpoints->endpoint() << "...\n";
-
-		// Set a deadline for the connect operation.
-		m_deadline.expires_after(std::chrono::seconds(60));
 
 		// Start the asynchronous connect operation.
 		m_socket.async_connect(_iterEndpoints->endpoint(),
@@ -94,16 +86,10 @@ void Proxy::HandleConnect(const std::error_code& _error, tcp::resolver::results_
 		m_isConnect = true;
 		// Start the input actor.
 		this->StartRead();
-		
-		// Start the heartbeat actor.
-		this->StartWrite();
 	}
 }
 
 void Proxy::StartRead() {
-	// Set a deadline for the read operation.
-	m_deadline.expires_after(std::chrono::seconds(30));
-
 	// Start an asynchronous operation to read a newline-delimited message.
 	asio::async_read_until(m_socket,
 		asio::dynamic_buffer(m_inputBuffer), '\n',
@@ -138,18 +124,8 @@ void Proxy::StartWrite() {
 		return;
 
 	// Start an asynchronous operation to send a heartbeat message.
-	if (false == m_sendBufferQueue.empty()) {
-		asio::async_write(m_socket, asio::buffer("1", 1),
-			[this](std::error_code _err, size_t)->void {
-				if (!_err) {
-					m_sendBufferQueue.pop();
-				}
-				else
-					this->Stop();
-			}
-		);
-	}
-	asio::async_write(m_socket, asio::buffer("\n", 1),
+	auto& buff = m_sendBufferQueue.front();
+	asio::async_write(m_socket, asio::buffer("123\n", 4),
 		std::bind(&Proxy::HandleWrite, this, _1));
 	
 }
@@ -159,35 +135,13 @@ void Proxy::HandleWrite(const std::error_code& _error) {
 		return;
 
 	if (!_error) {
-		// Wait 10 seconds before sending the next heartbeat.
-		m_heartbeatTimer.expires_after(std::chrono::seconds(10));
-		m_heartbeatTimer.async_wait(std::bind(&Proxy::StartWrite, this));
+		m_sendBufferQueue.pop();
+		if (false == m_sendBufferQueue.empty())
+			this->StartWrite();
 	}
 	else {
 		std::cout << "Error on heartbeat: " << _error.message() << "\n";
 
 		this->Stop();
 	}
-}
-
-void Proxy::CheckDeadline() {
-	if (m_stopped)
-		return;
-
-	// Check whether the deadline has passed. We compare the deadline against
-	// the current time since a new asynchronous operation may have moved the
-	// deadline before this actor had a chance to run.
-	if (m_deadline.expiry() <= steady_timer::clock_type::now()) {
-		// The deadline has passed. The socket is closed so that any outstanding
-		// asynchronous operations are cancelled.
-		m_socket.close();
-
-		// There is no longer an active deadline. The expiry is set to the
-		// maximum time point so that the actor takes no action until a new
-		// deadline is set.
-		m_deadline.expires_at(steady_timer::time_point::max());
-	}
-
-	// Put the actor back to sleep.
-	m_deadline.async_wait(std::bind(&Proxy::CheckDeadline, this));
 }

@@ -34,8 +34,6 @@ private:
 	void StartWrite();
 	void HandleWrite(const std::error_code& _error);
 
-	void CheckDeadline();
-
 	bool m_stopped = false;
 	bool m_isConnect = false;
 
@@ -45,7 +43,4 @@ private:
 
 	std::string m_inputBuffer;
 	std::queue<Buffer> m_sendBufferQueue;
-
-	steady_timer m_deadline;
-	steady_timer m_heartbeatTimer;
 };
