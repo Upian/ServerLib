@@ -2,6 +2,11 @@
 #include "Proxy.h"
 #include <iostream>
 
+Proxy::~Proxy() {
+	delete m_ioContext;
+	m_ioContext = nullptr;
+}
+
 void Proxy::Start(tcp::resolver::results_type _endpoints) {
 	m_endpoints = _endpoints;
 	this->StartConnect(m_endpoints.begin());
@@ -16,10 +21,26 @@ void Proxy::Stop() {
 	m_heartbeatTimer.cancel();
 }
 
-Proxy::Proxy(asio::io_context& _ioContext) :
-	m_socket(_ioContext),
-	m_deadline(_ioContext),
-	m_heartbeatTimer(_ioContext)
+void Proxy::Send(Buffer& _buffer) { //나중에 패킷 풀로 변경
+	if (false == m_isConnect)
+		return;
+
+	asio::post(*m_ioContext,
+		[this, &_buffer]()->void {
+			bool isEmptyQ = m_sendBufferQueue.empty();
+			m_sendBufferQueue.push(_buffer);
+			if (true == isEmptyQ) {
+				this->StartWrite();
+			}
+		}
+	);
+}
+
+Proxy::Proxy(asio::io_context* _ioContext) :
+	m_socket(*_ioContext),
+	m_deadline(*_ioContext),
+	m_heartbeatTimer(*_ioContext),
+	m_ioContext(_ioContext)
 { }
 
 void Proxy::StartConnect(tcp::resolver::results_type::iterator _iterEndpoints) {
@@ -70,7 +91,7 @@ void Proxy::HandleConnect(const std::error_code& _error, tcp::resolver::results_
 	// Otherwise we have successfully established a connection.
 	else {
 		std::cout << "Connected to " << _iterEndpoints->endpoint() << "\n";
-
+		m_isConnect = true;
 		// Start the input actor.
 		this->StartRead();
 		
@@ -117,8 +138,20 @@ void Proxy::StartWrite() {
 		return;
 
 	// Start an asynchronous operation to send a heartbeat message.
+	if (false == m_sendBufferQueue.empty()) {
+		asio::async_write(m_socket, asio::buffer("1", 1),
+			[this](std::error_code _err, size_t)->void {
+				if (!_err) {
+					m_sendBufferQueue.pop();
+				}
+				else
+					this->Stop();
+			}
+		);
+	}
 	asio::async_write(m_socket, asio::buffer("\n", 1),
 		std::bind(&Proxy::HandleWrite, this, _1));
+	
 }
 
 void Proxy::HandleWrite(const std::error_code& _error) {

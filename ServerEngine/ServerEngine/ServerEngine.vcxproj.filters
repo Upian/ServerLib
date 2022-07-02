@@ -39,6 +39,9 @@
     <ClCompile Include="Proxy.cpp">
       <Filter>TCPClientModule</Filter>
     </ClCompile>
+    <ClCompile Include="TCPClientModule.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
