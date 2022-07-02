@@ -1,4 +1,6 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "../../asio/include/asio.hpp"
 #include <memory>
 #include <list>
@@ -12,3 +14,4 @@
 #include <set>
 #include <queue>
 #include "Common.h"
+

@@ -91,26 +91,16 @@ void Proxy::HandleConnect(const std::error_code& _error, tcp::resolver::results_
 
 void Proxy::StartRead() {
 	// Start an asynchronous operation to read a newline-delimited message.
-	asio::async_read_until(m_socket,
-		asio::dynamic_buffer(m_inputBuffer), '\n',
-		std::bind(&Proxy::HandleRead, this, _1, _2));
+//	asio::async_read_until(m_socket,
+//		asio::dynamic_buffer(m_inputBuffer), '\n',
+//		std::bind(&Proxy::HandleRead, this, _1, _2));
+	asio::async_read(m_socket, asio::buffer(m_inputBuffer.GetBuffer(), kHEADER_SIZE),
+		std::bind(&Proxy::HandleReadHeader, this, _1, _2));
 }
 
-void Proxy::HandleRead(const std::error_code& _error, std::size_t _size) {
-	if (true == m_stopped)
-		return;
-	std::cout << "Read"<<m_inputBuffer << std::endl;
-	if (!_error) {
-		// Extract the newline-delimited message from the buffer.
-		std::string line(m_inputBuffer.substr(0, _size - 1));
-		m_inputBuffer.erase(0, _size);
-
-		// Empty messages are heartbeats and so ignored.
-		if (!line.empty()) {
-			std::cout << "Received: " << line << "\n";
-		}
-
-		this->StartRead();
+void Proxy::HandleReadHeader(const std::error_code& _error, std::size_t _size) {
+	if (!_error && true == m_inputBuffer.DecodeHeader()) {
+		asio::async_read(m_socket, asio::buffer(m_inputBuffer.GetBody(), m_inputBuffer.GetBodySize()), std::bind(&Proxy::HandleRead, this, _1, _2));
 	}
 	else {
 		std::cout << "Error on receive: " << _error.message() << "\n";
@@ -119,14 +109,31 @@ void Proxy::HandleRead(const std::error_code& _error, std::size_t _size) {
 	}
 }
 
+void Proxy::HandleRead(const std::error_code& _error, std::size_t _size) {
+	if (true == m_stopped)
+		return;
+	
+	if (!_error) {
+		std::cout.write(m_inputBuffer.GetBody(), m_inputBuffer.GetBodySize());
+		std::cout << "\n";
+		m_inputBuffer.Clear();
+	}
+	else {
+		this->Stop();
+	}
+	
+
+	this->StartRead();
+}
+
 void Proxy::StartWrite() {
 	if (true == m_stopped)
 		return;
 
 	// Start an asynchronous operation to send a message
 	auto& buff = m_sendBufferQueue.front();
-	std::cout << buff.GetBuffer() << "\tLength: "<< buff.GetLength() << std::endl; //Test
-	asio::async_write(m_socket, asio::buffer(buff.GetBuffer(), buff.GetLength()),
+	std::cout << "Send: " << buff.GetBody() << "\tLength: " << buff.GetBodySize() << std::endl; //Test
+	asio::async_write(m_socket, asio::buffer(buff.GetBuffer(), buff.GetBufferSize()),
 		std::bind(&Proxy::HandleWrite, this, _1));
 	
 }

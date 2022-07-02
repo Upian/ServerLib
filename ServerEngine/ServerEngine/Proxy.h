@@ -29,6 +29,7 @@ private:
 	void HandleConnect(const std::error_code& _error, tcp::resolver::results_type::iterator _iterEndpoints);
 	
 	void StartRead();
+	void HandleReadHeader(const std::error_code& _error, std::size_t _size);
 	void HandleRead(const std::error_code& _error, std::size_t _size);
 
 	void StartWrite();
@@ -41,6 +42,6 @@ private:
 	tcp::socket m_socket;
 	asio::io_context* m_ioContext = nullptr;
 
-	std::string m_inputBuffer;
+	Buffer m_inputBuffer;
 	std::queue<Buffer> m_sendBufferQueue;
 };
