@@ -1,5 +1,6 @@
 #pragma once
 #include "Common.h"
+#include "ObjectPool.h"
 
 class Buffer {
 public:
@@ -9,4 +10,11 @@ public:
 private:
 	char m_buffer[kMAX_BUFFER_SIZE];
 	size_t m_length = 0;
+};
+
+class BufferPool : public ObjectPool<Buffer>{
+public:
+
+private:
+
 };

@@ -71,5 +71,8 @@
     <ClInclude Include="Buffer.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectPool.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

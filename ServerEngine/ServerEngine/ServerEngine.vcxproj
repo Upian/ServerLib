@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="Proxy.h" />
     <ClInclude Include="ServerEngine.h" />
     <ClInclude Include="Session.h" />
