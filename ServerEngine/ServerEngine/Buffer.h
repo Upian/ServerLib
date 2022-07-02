@@ -5,11 +5,13 @@
 class Buffer {
 public:
 	const char* GetBuffer() const { return m_buffer; }
-	size_t GetLength() const { return m_length; }
+	char* GetBuffer() { return m_buffer; }
+	size_t GetLength() const { return strlen(m_buffer); }
+	void SetBuffer(const char* _buff);
 
+	void Clear();
 private:
 	char m_buffer[kMAX_BUFFER_SIZE];
-	size_t m_length = 0;
 };
 
 class BufferPool : public ObjectPool<Buffer>{

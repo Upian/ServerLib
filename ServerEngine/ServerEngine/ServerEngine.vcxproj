@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Proxy.cpp" />
     <ClCompile Include="ServerEngine.cpp" />
     <ClCompile Include="Session.cpp" />

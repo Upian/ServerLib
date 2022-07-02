@@ -99,7 +99,7 @@ void Proxy::StartRead() {
 void Proxy::HandleRead(const std::error_code& _error, std::size_t _size) {
 	if (true == m_stopped)
 		return;
-
+	std::cout << "Read"<<m_inputBuffer << std::endl;
 	if (!_error) {
 		// Extract the newline-delimited message from the buffer.
 		std::string line(m_inputBuffer.substr(0, _size - 1));
@@ -123,9 +123,10 @@ void Proxy::StartWrite() {
 	if (true == m_stopped)
 		return;
 
-	// Start an asynchronous operation to send a heartbeat message.
+	// Start an asynchronous operation to send a message
 	auto& buff = m_sendBufferQueue.front();
-	asio::async_write(m_socket, asio::buffer("123\n", 4),
+	std::cout << buff.GetBuffer() << "\tLength: "<< buff.GetLength() << std::endl; //Test
+	asio::async_write(m_socket, asio::buffer(buff.GetBuffer(), buff.GetLength()),
 		std::bind(&Proxy::HandleWrite, this, _1));
 	
 }
@@ -140,8 +141,6 @@ void Proxy::HandleWrite(const std::error_code& _error) {
 			this->StartWrite();
 	}
 	else {
-		std::cout << "Error on heartbeat: " << _error.message() << "\n";
-
 		this->Stop();
 	}
 }
