@@ -19,7 +19,7 @@ public:
 
 	void Clear();
 private:
-	char m_buffer[kHEADER_SIZE + kMAX_BUFFER_SIZE];
+	char m_buffer[kHEADER_SIZE + kMAX_BUFFER_SIZE] = { 0, };
 	size_t m_bodySize = 0;
 };
 

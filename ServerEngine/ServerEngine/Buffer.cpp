@@ -10,7 +10,7 @@ void Buffer::SetBufferSize(size_t _size) {
 void Buffer::EncodeHeader() {
 	char header[kHEADER_SIZE + 1] = "";
 	std::sprintf(header, "%4d", static_cast<int>(m_bodySize));
-	std::memcpy(m_buffer, header, m_bodySize);
+	std::memcpy(m_buffer, header, kHEADER_SIZE);
 }
 
 bool Buffer::DecodeHeader() {
@@ -30,4 +30,5 @@ bool Buffer::DecodeHeader() {
 
 void Buffer::Clear() {
 	memset(m_buffer, 0, kMAX_BUFFER_SIZE);
+	m_bodySize = 0;
 }

@@ -11,6 +11,7 @@ int main(void) {
 	char line[kMAX_BUFFER_SIZE + 1];
 	while (std::cin.getline(line, kMAX_BUFFER_SIZE + 1)) {
 		Buffer msg;
+//		msg.Clear();
 		msg.SetBufferSize(std::strlen(line));
 		std::memcpy(msg.GetBody(), line, msg.GetBodySize());
 		msg.EncodeHeader();

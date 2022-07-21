@@ -1,7 +1,11 @@
 #pragma once
 #include "stdafx.h"
+#include "Buffer.h"
 
 using asio::ip::tcp;
+using std::placeholders::_1;
+using std::placeholders::_2;
+
 class Session : public std::enable_shared_from_this<Session> {
 public:
 	std::shared_ptr<Session> GetPtr() {
@@ -19,9 +23,13 @@ public:
 private:
 	Session(tcp::socket _socket);
 
+	void ReadHeader();
+	void ReadBody();
+
 	void DoRead();
-	void DoWrite(std::size_t _length);
+	void DoWrite();
 	
 	tcp::socket m_socket;
-	char m_data[kMAX_BUFFER_SIZE];
+	Buffer m_readBuffer;
+	std::queue<Buffer> m_writeBufferQueue;
 };

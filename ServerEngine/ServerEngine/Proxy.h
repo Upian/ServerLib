@@ -28,12 +28,14 @@ private:
 	void StartConnect(tcp::resolver::results_type::iterator _iterEndpoints);
 	void HandleConnect(const std::error_code& _error, tcp::resolver::results_type::iterator _iterEndpoints);
 	
+//	void ReadHeader();
+//	void ReadBody();
+
 	void StartRead();
 	void HandleReadHeader(const std::error_code& _error, std::size_t _size);
 	void HandleRead(const std::error_code& _error, std::size_t _size);
 
-	void StartWrite();
-	void HandleWrite(const std::error_code& _error);
+	void DoWrite();
 
 	bool m_stopped = false;
 	bool m_isConnect = false;

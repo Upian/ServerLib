@@ -14,8 +14,11 @@ void Proxy::Start(tcp::resolver::results_type _endpoints) {
 
 void Proxy::Stop() {
 	m_stopped = true;
-	std::error_code ignoredError;
-	m_socket.close(ignoredError);
+	asio::post(*m_ioContext, [this]() -> void {
+		std::error_code ignoredError;
+		m_socket.close(ignoredError);
+		}
+	);
 }
 
 void Proxy::Send(Buffer& _buffer) { //나중에 패킷 풀로 변경
@@ -23,11 +26,11 @@ void Proxy::Send(Buffer& _buffer) { //나중에 패킷 풀로 변경
 		return;
 
 	asio::post(*m_ioContext,
-		[this, &_buffer]()->void {
+		[this, &_buffer]() -> void {
 			bool isEmptyQ = m_sendBufferQueue.empty();
 			m_sendBufferQueue.push(_buffer);
 			if (true == isEmptyQ) {
-				this->StartWrite();
+				this->DoWrite();
 			}
 		}
 	);
@@ -94,6 +97,7 @@ void Proxy::StartRead() {
 //	asio::async_read_until(m_socket,
 //		asio::dynamic_buffer(m_inputBuffer), '\n',
 //		std::bind(&Proxy::HandleRead, this, _1, _2));
+
 	asio::async_read(m_socket, asio::buffer(m_inputBuffer.GetBuffer(), kHEADER_SIZE),
 		std::bind(&Proxy::HandleReadHeader, this, _1, _2));
 }
@@ -126,28 +130,22 @@ void Proxy::HandleRead(const std::error_code& _error, std::size_t _size) {
 	this->StartRead();
 }
 
-void Proxy::StartWrite() {
-	if (true == m_stopped)
-		return;
-
-	// Start an asynchronous operation to send a message
-	auto& buff = m_sendBufferQueue.front();
+void Proxy::DoWrite() {
+	auto buff = m_sendBufferQueue.front();
 	std::cout << "Send: " << buff.GetBody() << "\tLength: " << buff.GetBodySize() << std::endl; //Test
-	asio::async_write(m_socket, asio::buffer(buff.GetBuffer(), buff.GetBufferSize()),
-		std::bind(&Proxy::HandleWrite, this, _1));
-	
-}
 
-void Proxy::HandleWrite(const std::error_code& _error) {
-	if (m_stopped)
-		return;
-
-	if (!_error) {
-		m_sendBufferQueue.pop();
-		if (false == m_sendBufferQueue.empty())
-			this->StartWrite();
-	}
-	else {
-		this->Stop();
-	}
+	asio::async_write(m_socket,
+		asio::buffer(m_sendBufferQueue.front().GetBuffer(),
+			m_sendBufferQueue.front().GetBufferSize()),
+		[this](std::error_code ec, std::size_t /*length*/) {
+			if (!ec) {
+				m_sendBufferQueue.pop();
+				if (false == m_sendBufferQueue.empty()) {
+					DoWrite();
+				}
+			}
+			else {
+				this->Stop();
+			}
+		});
 }
