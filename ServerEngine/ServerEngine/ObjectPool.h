@@ -2,7 +2,8 @@
 #include <memory>
 
 template<typename _Type>
-class ObjectPool {
+class ObjectPool
+{
 public:
 	ObjectPool();
 	virtual ~ObjectPool();
@@ -23,8 +24,10 @@ template<typename _Type>
 inline ObjectPool<_Type>::~ObjectPool() { }
 
 template<typename _Type>
-inline void ObjectPool<_Type>::Initialize(size_t _size) {
-	for (int i = 0; i < _size; ++i) {
+inline void ObjectPool<_Type>::Initialize(size_t _size)
+{
+	for (int i = 0; i < _size; ++i)
+	{
 		_Type* temp = static_cast<_Type*>(malloc(sizeof(_Type)));
 		*((_Type**)temp) = m_objects;
 		m_objects = temp;
@@ -33,7 +36,8 @@ inline void ObjectPool<_Type>::Initialize(size_t _size) {
 }
 
 template<typename _Type>
-inline _Type* ObjectPool<_Type>::Alloc() {
+inline _Type* ObjectPool<_Type>::Alloc()
+{
 	if (nullptr == m_objects)
 		return malloc(sizeof(_Type));
 
@@ -44,10 +48,11 @@ inline _Type* ObjectPool<_Type>::Alloc() {
 }
 
 template<typename _Type>
-inline void ObjectPool<_Type>::Release(_Type* _obj) {
+inline void ObjectPool<_Type>::Release(_Type* _obj)
+{
 	*((_Type**)_obj) = m_objects;
 	m_objects = (_Type*)_obj;
 	++m_objectsCount;
-	
+
 	return;
 }

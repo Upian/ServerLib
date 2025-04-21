@@ -7,14 +7,17 @@ using asio::ip::tcp;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-class Proxy : public std::enable_shared_from_this<Proxy> {
+class Proxy : public std::enable_shared_from_this<Proxy>
+{
 public:
 	virtual ~Proxy();
-	std::shared_ptr<Proxy> GetPtr() {
+	std::shared_ptr<Proxy> GetPtr()
+	{
 		return shared_from_this();
 	}
 
-	[[nodiscard]] static std::shared_ptr<Proxy> Create(asio::io_context* _ioContext) {
+	[[nodiscard]] static std::shared_ptr<Proxy> Create(asio::io_context* _ioContext)
+	{
 		//		return std::make_shared<Session>(std::move(_socket));
 		return std::shared_ptr<Proxy>(new Proxy(_ioContext)); //나중에 ObjectPool에서 가져올 필요 있다.
 	}
@@ -24,12 +27,12 @@ public:
 	void Send(Buffer& _buffer);
 private:
 	Proxy(asio::io_context* _ioContext);
-	
+
 	void StartConnect(tcp::resolver::results_type::iterator _iterEndpoints);
 	void HandleConnect(const std::error_code& _error, tcp::resolver::results_type::iterator _iterEndpoints);
-	
-//	void ReadHeader();
-//	void ReadBody();
+
+	//	void ReadHeader();
+	//	void ReadBody();
 
 	void StartRead();
 	void HandleReadHeader(const std::error_code& _error, std::size_t _size);

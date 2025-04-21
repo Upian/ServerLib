@@ -3,7 +3,8 @@
 #include "Session.h"
 using asio::ip::tcp;
 
-class TCPServerModule {
+class TCPServerModule 
+{
 public:
 	TCPServerModule(asio::io_context& _ioContext, short _port);
 
@@ -19,9 +20,11 @@ private:
 
 template<typename T_Session,
 	typename std::enable_if_t<std::is_base_of_v<Session, T_Session> >*>
-void TCPServerModule::DoAccept() {
+void TCPServerModule::DoAccept() 
+{
 	m_acceptor.async_accept(m_socket,
-		[this](std::error_code _error) ->void {
+		[this](std::error_code _error) -> void 
+		{
 			if (!_error) {
 				Session::Create(std::move(m_socket))->Start();
 //				std::make_shared<Session>(std::move(m_socket))->Start();

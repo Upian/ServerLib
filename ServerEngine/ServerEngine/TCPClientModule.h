@@ -3,7 +3,8 @@
 
 class Buffer;
 class Proxy;
-class TCPClientModule {
+class TCPClientModule
+{
 public:
 	~TCPClientModule();
 	void ConnectServer(std::string& _ip, uint16_t _port, uint16_t _serverSN);

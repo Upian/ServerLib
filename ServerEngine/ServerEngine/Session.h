@@ -6,13 +6,16 @@ using asio::ip::tcp;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-class Session : public std::enable_shared_from_this<Session> {
+class Session : public std::enable_shared_from_this<Session> 
+{
 public:
-	std::shared_ptr<Session> GetPtr() {
+	std::shared_ptr<Session> GetPtr() 
+	{
 		return shared_from_this();
 	}
 
-	[[nodiscard]] static std::shared_ptr<Session> Create(tcp::socket _socket) {
+	[[nodiscard]] static std::shared_ptr<Session> Create(tcp::socket _socket) 
+	{
 //		return std::make_shared<Session>(std::move(_socket));
 		return std::shared_ptr<Session>(new Session(std::move(_socket))); //나중에 ObjectPool에서 가져올 필요 있다.
 	}
