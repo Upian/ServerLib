@@ -14,11 +14,9 @@ public:
 		return shared_from_this();
 	}
 
-	[[nodiscard]] static std::shared_ptr<Session> Create(tcp::socket _socket) 
-	{
-//		return std::make_shared<Session>(std::move(_socket));
-		return std::shared_ptr<Session>(new Session(std::move(_socket))); //나중에 ObjectPool에서 가져올 필요 있다.
-	}
+	template<typename T_Session>
+	requires std::derived_from<T_Session, Session>
+	static std::shared_ptr<T_Session> Create(tcp::socket _socket);
 
 	void Start();
 	
@@ -36,3 +34,11 @@ private:
 	Buffer m_readBuffer;
 	std::queue<Buffer> m_writeBufferQueue;
 };
+
+template<typename T_Session>
+requires std::derived_from<T_Session, Session>
+static std::shared_ptr<T_Session> Session::Create(tcp::socket _socket)
+{
+//	return std::make_shared<Session>(std::move(_socket));
+	return std::shared_ptr<T_Session>(new T_Session(std::move(_socket))); //나중에 ObjectPool에서 가져올 필요 있다.
+}
