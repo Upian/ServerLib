@@ -39,7 +39,7 @@ asio::awaitable<void> Session::ReadHeader()
 		asio::use_awaitable
 	);
 
-	if (!m_readBuffer.DecodeHeader())
+	if (false == m_readBuffer.DecodeHeader())
 	{
 		throw std::runtime_error("Header decode failed");
 	}
