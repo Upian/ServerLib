@@ -27,7 +27,7 @@ void TCPClientModule::ConnectServer(std::string& _ip, uint16_t _port, uint16_t _
 	m_proxyThreadMap.emplace(
 		_serverSN,
 		std::thread(
-			[&ioContext]()->void {
+			[ioContext]()->void {
 				ioContext->run();
 			})
 	);

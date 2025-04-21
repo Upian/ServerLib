@@ -8,7 +8,7 @@ int main(void)
 	TCPClientModule client;
 	std::string ip = "127.0.0.1";
 	client.ConnectServer(ip, 25000, 1);
-
+	std::cout << "Connect server" << std::endl;
 	char line[kMAX_BUFFER_SIZE + 1];
 	while (std::cin.getline(line, kMAX_BUFFER_SIZE + 1))
 	{
