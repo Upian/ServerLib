@@ -38,7 +38,7 @@ template<typename T_Session>
 asio::awaitable<void> TCPServerModule::DoAccept()
 {
 	auto executor = co_await this_coro::executor;
-
+	static unsigned long long connectionNumber = 0;
 	while (true)
 	{
 		try

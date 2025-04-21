@@ -8,7 +8,11 @@ asio::awaitable<void> Session::Start()
 }
 
 Session::Session(tcp::socket&& _socket) :
-	m_socket(std::move(_socket)) { }
+	m_socket(std::move(_socket)) 
+{
+	static unsigned long long connectionNum = 0;
+	m_connectionNum = ++connectionNum;
+}
 
 asio::awaitable<void> Session::DoRead()
 {
@@ -19,7 +23,7 @@ asio::awaitable<void> Session::DoRead()
 			co_await ReadHeader();
 			co_await ReadBody();
 
-			std::cout << "MSG: " << m_readBuffer.GetBody() << ": " << m_readBuffer.GetBodySize() << std::endl;
+			std::cout << m_connectionNum << " MSG: " << m_readBuffer.GetBody() << ": " << m_readBuffer.GetBodySize() << std::endl;
 			m_readBuffer.Clear();
 		}
 	}

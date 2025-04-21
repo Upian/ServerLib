@@ -21,6 +21,7 @@ public:
 	asio::awaitable<void> Start();
 	
 	virtual void HandlePacket() {};
+
 private:
 	Session(tcp::socket&& _socket);
 	
@@ -33,6 +34,7 @@ private:
 	tcp::socket m_socket;
 	Buffer m_readBuffer;
 	std::queue<Buffer> m_writeBufferQueue;
+	unsigned long long m_connectionNum = 0;
 };
 
 template<typename T_Session>
