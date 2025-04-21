@@ -1,69 +1,62 @@
 #include "stdafx.h"
 #include "Session.h"
 
-void Session::Start() 
+asio::awaitable<void> Session::Start()
 {
-	this->DoRead();
-	
+	co_await this->DoRead();
+	co_return;
 }
 
-Session::Session(tcp::socket _socket) :
+Session::Session(tcp::socket&& _socket) :
 	m_socket(std::move(_socket)) { }
 
-void Session::ReadHeader() 
+asio::awaitable<void> Session::DoRead()
 {
-	auto self(shared_from_this());
-	asio::async_read(m_socket,
+	try
+	{
+		while (true)
+		{
+			co_await ReadHeader();
+			co_await ReadBody();
+
+			std::cout << "MSG: " << m_readBuffer.GetBody() << ": " << m_readBuffer.GetBodySize() << std::endl;
+			m_readBuffer.Clear();
+		}
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "DoRead Fail: " << e.what() << "\n";
+	}
+
+	co_return;
+}
+
+asio::awaitable<void> Session::ReadHeader()
+{
+	std::size_t n = co_await asio::async_read(
+		m_socket,
 		asio::buffer(m_readBuffer.GetBuffer(), kHEADER_SIZE),
-		[this, self](std::error_code _error, std::size_t /*length*/) -> void {
-			if (!_error && m_readBuffer.DecodeHeader()) 
-			{
-				this->ReadBody();
-			}
-			else 
-			{
-				//log
-			}
-		}
+		asio::use_awaitable
 	);
+
+	if (!m_readBuffer.DecodeHeader())
+	{
+		throw std::runtime_error("Header decode failed");
+	}
+
+	co_return;
 }
 
-void Session::ReadBody()
+asio::awaitable<void> Session::ReadBody()
 {
-	auto self(shared_from_this());
-	asio::async_read(m_socket,
+	std::size_t n = co_await asio::async_read(
+		m_socket,
 		asio::buffer(m_readBuffer.GetBody(), m_readBuffer.GetBodySize()),
-		[this, self](std::error_code _error, std::size_t /*length*/) -> void {
-			if (!_error)
-			{
-				std::cout << "MSG: " << m_readBuffer.GetBody() << ": " << m_readBuffer.GetBodySize() << std::endl;
-				m_readBuffer.Clear();
-				this->ReadHeader();
-
-			}
-			else
-			{
-				//log
-			}
-		}
+		asio::use_awaitable
 	);
+
+	co_return;
 }
-
-void Session::DoRead()
-{
-	this->ReadHeader();
-	//	auto self(shared_from_this());
-	//	m_socket.async_read_some(asio::buffer(m_data, kMAX_BUFFER_SIZE),
-	//		[this, self](std::error_code _error, std::size_t _length) ->void {
-	//			if (!_error) {
-	//				this->ReadHeader();
-	////				DoWrite(_length);
-	//			}		
-	//		}
-	//	);
-}
-
-
 
 void Session::DoWrite()
 {

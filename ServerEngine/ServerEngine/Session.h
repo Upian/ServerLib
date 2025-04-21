@@ -16,18 +16,18 @@ public:
 
 	template<typename T_Session>
 	requires std::derived_from<T_Session, Session>
-	static std::shared_ptr<T_Session> Create(tcp::socket _socket);
+	static std::shared_ptr<T_Session> Create(tcp::socket&& _socket);
 
-	void Start();
+	asio::awaitable<void> Start();
 	
 	virtual void HandlePacket() {};
 private:
-	Session(tcp::socket _socket);
+	Session(tcp::socket&& _socket);
+	
+	asio::awaitable<void> DoRead();
+	asio::awaitable<void> ReadHeader();
+	asio::awaitable<void> ReadBody();
 
-	void ReadHeader();
-	void ReadBody();
-
-	void DoRead();
 	void DoWrite();
 	
 	tcp::socket m_socket;
@@ -37,7 +37,7 @@ private:
 
 template<typename T_Session>
 requires std::derived_from<T_Session, Session>
-static std::shared_ptr<T_Session> Session::Create(tcp::socket _socket)
+static std::shared_ptr<T_Session> Session::Create(tcp::socket&& _socket)
 {
 //	return std::make_shared<Session>(std::move(_socket));
 	return std::shared_ptr<T_Session>(new T_Session(std::move(_socket))); //나중에 ObjectPool에서 가져올 필요 있다.
