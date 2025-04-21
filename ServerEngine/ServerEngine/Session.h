@@ -39,6 +39,6 @@ template<typename T_Session>
 requires std::derived_from<T_Session, Session>
 static std::shared_ptr<T_Session> Session::Create(tcp::socket&& _socket)
 {
-	return std::make_shared<Session>(std::move(_socket));
-//	return std::shared_ptr<T_Session>(new T_Session(std::move(_socket))); //나중에 ObjectPool에서 가져올 필요 있다.
+//	return std::make_shared<Session>(std::move(_socket)); //이동 생성자가 private라..
+	return std::shared_ptr<T_Session>(new T_Session(std::move(_socket))); //나중에 ObjectPool에서 가져올 필요 있다.
 }
