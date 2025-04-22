@@ -1,8 +1,14 @@
 #include "stdafx.h"
 #include "Session.h"
 
+Session::~Session()
+{
+	std::cout << "Destroy session: " << m_connectionNum << std::endl;
+}
+
 asio::awaitable<void> Session::Start()
 {
+//	co_spawn(co_await asio::this_coro::executor, this->DoRead(), asio::detached);
 	co_await this->DoRead();
 	co_return;
 }
@@ -12,6 +18,7 @@ Session::Session(tcp::socket&& _socket) :
 {
 	static unsigned long long connectionNum = 0;
 	m_connectionNum = ++connectionNum;
+	std::cout << "Create session: " << m_connectionNum << std::endl;
 }
 
 asio::awaitable<void> Session::DoRead()
